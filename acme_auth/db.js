@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-const { STRING, INTEGER } = Sequelize;
+const { STRING } = Sequelize;
 const config = {
   logging: false
 };
@@ -33,10 +33,17 @@ User.beforeCreate(async (user) => {
     user.password = hashed;
 });
 
+// User.addHook('beforeSave', async function (user) {
+//   const hashed = await bcrypt.hash(user.password, 10);
+//     console.log(hashed);
+//     user.password = hashed;
+// });
+
 User.authenticate = async({ username, password })=> {
     const user = await User.findOne({
       where: {
         username
+        //do not include password because an existing password will be hashed;
       }
     });
     if(user){
@@ -66,7 +73,7 @@ User.byToken = async(token)=> {
     throw error;
   }
   catch(ex){
-    const error = Error('bad credentials');
+    const error = Error('bad credentials');k
     error.status = 401;
     throw error;
   }

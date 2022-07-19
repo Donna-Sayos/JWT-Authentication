@@ -4,12 +4,13 @@ app.use(express.json());
 const { models: { User, Note }} = require('./db');
 const path = require('path');
 
+//this is used as a callback
 const requireToken = async (req, res, next) => {
     try {
-        const token = req.headers.authorization;
-        const user = await User.byToken(token);
-        req.user = user;
-        next();
+        const token = req.headers.authorization; //this checks if there is a header;
+        const user = await User.byToken(token); //token is your user, with hashing;
+        req.user = user; //if the user exist, add that user to the request;
+        next(); //prevents an infinite loop and allows req to move onto the next function;
     } catch (e) {
         next(e);
     }
@@ -26,6 +27,8 @@ app.post('/api/auth', async(req, res, next)=> {
   }
 });
 
+// you can add additional functions before the request reaches responds to the client
+// app.get('/api/auth', isAdmin, isLoggedIn, requireToken, async (req, res, next) => { ...
 app.get('/api/auth', requireToken, async(req, res, next)=> {
   try {
     res.send(req.user);
